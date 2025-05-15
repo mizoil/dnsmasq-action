@@ -1,4 +1,4 @@
-name: "Dnsmasq configuration check"
+name: "mizoil-dnsmasq-config-check"
 description: "GitHub Action for validating Dnsmasq configuration files using Docker"
 author: "mizoil"
 
