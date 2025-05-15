@@ -1,0 +1,36 @@
+name: "Dnsmasq configuration check"
+description: "GitHub Action for validating Dnsmasq configuration files using Docker"
+author: "mizoil"
+
+branding:
+  color: blue
+  icon: file-text
+
+inputs:
+  file:
+    description: "Path to the Dnsmasq configuration file"
+    required: true
+    default: "dnsmasq.conf"
+
+  version:
+    description: "Dnsmasq Docker image version (only 2.89 supported)"
+    required: true
+
+runs:
+  using: "composite"
+  steps:
+    - name: Run Dnsmasq configuration check
+      shell: bash
+      run: |
+        echo "🔍 Checking Dnsmasq config at '${{ inputs.file }}' using version '${{ inputs.version }}'..."
+
+        if [ "${{ inputs.version }}" != "2.89" ]; then
+          echo "❌ Only version 2.89 is supported!"
+          exit 1
+        fi
+
+        docker run --rm \
+          -v "${{ github.workspace }}:/github" \
+          "itdoginfo/dnsmasq:${{ inputs.version }}" \
+          --conf-file="/github/${{ inputs.file }}" \
+          --test
