@@ -1,36 +1,22 @@
-name: "mizoil-dnsmasq-config-check"
-description: "GitHub Action for validating Dnsmasq configuration files using Docker"
-author: "mizoil"
+#!/bin/bash
 
-branding:
-  color: blue
-  icon: file-text
+# Выход при ошибке
+set -e
 
-inputs:
-  file:
-    description: "Path to the Dnsmasq configuration file"
-    required: true
-    default: "dnsmasq.conf"
+echo "🔧 Удаляю старый тег v0.1 (если есть)..."
+git tag -d v0.1 || true
+git push origin :refs/tags/v0.1 || true
 
-  version:
-    description: "Dnsmasq Docker image version (only 2.89 supported)"
-    required: true
+echo "✅ Старый тег удалён"
 
-runs:
-  using: "composite"
-  steps:
-    - name: Run Dnsmasq configuration check
-      shell: bash
-      run: |
-        echo "🔍 Checking Dnsmasq config at '${{ inputs.file }}' using version '${{ inputs.version }}'..."
+echo "📝 Добавляю изменения и коммичу (если нужно)..."
+git add action.yml README.md
+git commit -m "Add GitHub Action for Dnsmasq config check" || echo "✅ Уже закоммичено"
 
-        if [ "${{ inputs.version }}" != "2.89" ]; then
-          echo "❌ Only version 2.89 is supported!"
-          exit 1
-        fi
+echo "🏷 Создаю новый тег v0.1 на текущем коммите..."
+git tag v0.1
 
-        docker run --rm \
-          -v "${{ github.workspace }}:/github" \
-          "itdoginfo/dnsmasq:${{ inputs.version }}" \
-          --conf-file="/github/${{ inputs.file }}" \
-          --test
+echo "🚀 Публикую тег v0.1 на GitHub..."
+git push origin v0.1
+
+echo "✅ Всё готово. Теперь можно использовать Action как: mizoil/dnsmasq-action@v0.1"
